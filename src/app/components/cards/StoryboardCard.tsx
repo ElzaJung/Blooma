@@ -1,5 +1,5 @@
 import React, { forwardRef } from "react";
-import type { Attributes, Listeners } from "@dnd-kit/core";
+import type { DraggableSyntheticListeners } from "@dnd-kit/core";
 
 type Props = {
   id: string;
@@ -11,8 +11,8 @@ type Props = {
   onOpenTab: () => void;
   onShowImageOnly: () => void;
   onDelete: () => void;
-  attributes?: Attributes;
-  listeners?: Listeners | boolean;
+  attributes?: React.HTMLAttributes<HTMLDivElement>;
+  listeners?: DraggableSyntheticListeners | boolean;
   style?: React.CSSProperties;
 };
 
@@ -42,7 +42,7 @@ const StoryboardCard = forwardRef<HTMLDivElement, Props>(
       >
         {/* Drag handle */}
         <div
-          {...listeners}
+          {...(typeof listeners === "object" ? listeners : {})}
           className="absolute top-3 right-3 w-4 h-4 cursor-grab bg-gray-400 rounded-full"
           title="Drag"
         />
@@ -54,7 +54,7 @@ const StoryboardCard = forwardRef<HTMLDivElement, Props>(
             aria-label="Open Tab"
           />
           <button
-            onClick={onShowImageOnly}
+            //onClick={onShowImageOnly}
             className="w-5 h-5 rounded-full bg-[#FEA439] border border-black"
             aria-label="Show Image Only"
           />

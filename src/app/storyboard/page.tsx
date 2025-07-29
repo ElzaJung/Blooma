@@ -43,7 +43,7 @@ export default function ProjectPage() {
         {
           title: "Untitled Project",
           description: "Start writing your ideas here...",
-          user_id: user.id,
+          user_id: user?.id,
         },
       ])
       .select()
@@ -59,7 +59,6 @@ export default function ProjectPage() {
     const defaultCards = Array.from({ length: 6 }).map((_, i) => ({
       project_id: project.id,
       text: "",
-      image_url: null,
       sort_order: i + 1,
     }));
 
