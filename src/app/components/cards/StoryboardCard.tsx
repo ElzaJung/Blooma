@@ -5,14 +5,14 @@ type Props = {
   id: string;
   text: string;
   imageUrl: string | null;
-  onEdit: () => void;
-  onInsertImage: () => void;
-  onTextChange: (newText: string) => void;
-  onOpenTab: () => void;
-  onShowImageOnly: () => void;
-  onDelete: () => void;
+  onEdit?: () => void;
+  onInsertImage?: () => void;
+  onTextChange?: (newText: string) => void;
+  onOpenTab?: () => void;
+  onShowImageOnly?: () => void;
+  onDelete?: () => void;
   attributes?: React.HTMLAttributes<HTMLDivElement>;
-  listeners?: DraggableSyntheticListeners | boolean;
+  listeners?: DraggableSyntheticListeners;
   style?: React.CSSProperties;
 };
 
@@ -49,7 +49,7 @@ const StoryboardCard = forwardRef<HTMLDivElement, Props>(
         {/* Top color buttons */}
         <div className="flex gap-1 absolute top-4 left-4">
           <button
-            onClick={onOpenTab}
+            onClick={() => onOpenTab?.()}
             className="w-5 h-5 rounded-full bg-[#68DB94] border border-black"
             aria-label="Open Tab"
           />
@@ -91,7 +91,7 @@ const StoryboardCard = forwardRef<HTMLDivElement, Props>(
           className="bg-[#D9D9D9] p-4 rounded-xl text-sm min-h-[120px] w-full resize-none font-semibold border border-black"
           placeholder="Enter text here"
           value={text}
-          onChange={(e) => onTextChange(e.target.value)}
+          onChange={(e) => onTextChange?.(e.target.value)}
         />
       </div>
     );
