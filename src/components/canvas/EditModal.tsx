@@ -24,11 +24,10 @@ interface EditModalProps {
   isOpen: boolean
   onClose: () => void
   onSave: (data: CustomCardNodeData) => void
-  onDelete?: () => void
   nodeData: CustomCardNodeData
 }
 
-const EditModal = ({ isOpen, onClose, onSave, onDelete, nodeData }: EditModalProps) => {
+const EditModal = ({ isOpen, onClose, onSave, nodeData }: EditModalProps) => {
   const [title, setTitle] = useState(nodeData.title)
   const [content, setContent] = useState(nodeData.content)
   const [userInput, setUserInput] = useState(nodeData.userInput || '')

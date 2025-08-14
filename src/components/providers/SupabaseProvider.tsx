@@ -57,8 +57,10 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // Check cookie status
     if (typeof window !== 'undefined') {
-      const cookies = document.cookie.split(';').map(c => c.trim())
-      const supabaseCookies = cookies.filter(c => c.startsWith('sb-'))
+      document.cookie
+        .split(';')
+        .map(c => c.trim())
+        .filter(c => c.startsWith('sb-'))
     }
 
     const newState = {

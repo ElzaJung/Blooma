@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button'
 import { Palette, Zap, Users, Download } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useSupabase } from '@/components/providers/SupabaseProvider'
-import { AuthForm } from '@/components/auth/AuthForm'
 
 export default function Home() {
   const router = useRouter()

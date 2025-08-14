@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { ProjectCard } from '@/components/dashboard/ProjectCard'
@@ -23,7 +23,7 @@ export default function DashboardPage() {
   const [deletingProjects, setDeletingProjects] = useState<Set<string>>(new Set())
   const [projectsError, setProjectsError] = useState<string | null>(null)
 
-  const fetchProjects = async () => {
+  const fetchProjects = useCallback(async () => {
     if (!user?.id) {
       return
     }
@@ -63,7 +63,7 @@ export default function DashboardPage() {
     } finally {
       setProjectsLoading(false)
     }
-  }
+  }, [user?.id])
 
   useEffect(() => {
     if (!loading) {
@@ -74,7 +74,7 @@ export default function DashboardPage() {
         setProjectsError(null)
       }
     }
-  }, [loading, user?.id, session])
+  }, [loading, user?.id, session, fetchProjects])
 
   const handleCreateProject = async (projectData: ProjectInput) => {
     if (!user?.id) {
@@ -114,7 +114,7 @@ export default function DashboardPage() {
     }
   }
 
-  const handleUpdateProject = async (projectId: string, projectData: ProjectInput) => {
+  const handleUpdateProject = async (projectId: string, projectData: Partial<Project>) => {
     try {
       const response = await fetch('/api/projects', {
         method: 'PUT',

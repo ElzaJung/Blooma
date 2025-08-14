@@ -13,7 +13,7 @@ import {
   NodeChange,
   EdgeChange,
   Connection,
-  addEdge,
+  NodeProps,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import CustomCardNode from './CustomCardNode'
@@ -33,7 +33,6 @@ interface ContentMapProps {
   onEdgeDelete?: (edgeId: string) => void
   onUndo?: () => void
   canUndo?: boolean
-  allCards?: any[] // All cards in the storyboard for selection
 }
 
 const ContentMap: React.FC<ContentMapProps> = ({
@@ -49,7 +48,6 @@ const ContentMap: React.FC<ContentMapProps> = ({
   onEdgeDelete,
   onUndo,
   canUndo = false,
-  allCards,
 }) => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null)
   const [editingNode, setEditingNode] = useState<Node<CustomCardNodeData> | null>(null)
@@ -60,14 +58,9 @@ const ContentMap: React.FC<ContentMapProps> = ({
 
   // Define nodeTypes inside the component to access props
   const nodeTypes = {
-    customCard: (props: any) => (
-      <CustomCardNode {...props} onNodeDelete={onNodeDelete} allCards={allCards} />
+    customCard: (props: NodeProps<CustomCardNodeData>) => (
+      <CustomCardNode {...props} onNodeDelete={onNodeDelete} />
     ),
-  }
-
-  // 캔버스 클릭 시 아무 동작도 하지 않음 (카드 추가는 Add Card 버튼에서만)
-  const handlePaneClick = (event: React.MouseEvent) => {
-    // 예: 선택 해제 등 다른 용도로만 사용 가능
   }
 
   // Handle connection between nodes

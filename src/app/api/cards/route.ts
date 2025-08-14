@@ -8,9 +8,15 @@ type CardInsert = CardInput & {
   user_id: string
 }
 
+// Type for cards that might have timestamp fields
+type CardWithTimestamps = CardInsert & {
+  created_at?: string
+  updated_at?: string
+}
+
 export async function POST(request: NextRequest) {
   try {
-    const body: CardInsert | CardInsert[] = await request.json()
+    const body: CardWithTimestamps | CardWithTimestamps[] = await request.json()
     
     if (Array.isArray(body)) {
       // Handle multiple cards
@@ -24,7 +30,8 @@ export async function POST(request: NextRequest) {
       // Check if the database has timestamp columns by trying to insert without them first
       const cardsToInsert = body.map(card => {
         // Remove timestamp fields if they exist
-        const { created_at, updated_at, ...cardWithoutTimestamps } = card as any
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { created_at, updated_at, ...cardWithoutTimestamps } = card
         // Round position and dimension values to integers for database compatibility
         return {
           ...cardWithoutTimestamps,
@@ -59,7 +66,8 @@ export async function POST(request: NextRequest) {
       }
 
       // Remove timestamp fields for single card insert
-      const { created_at, updated_at, ...cardWithoutTimestamps } = body as any
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { created_at, updated_at, ...cardWithoutTimestamps } = body
       
       // Round position and dimension values to integers for database compatibility
       const cardToInsert = {
@@ -97,7 +105,7 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const body: { cards: (CardInput & { id: string })[] } = await request.json()
+    const body: { cards: (CardInput & { id: string; created_at?: string; updated_at?: string })[] } = await request.json()
     
     if (!body.cards || !Array.isArray(body.cards) || body.cards.length === 0) {
       return NextResponse.json(
@@ -109,9 +117,10 @@ export async function PUT(request: NextRequest) {
     // Update each card individually since Supabase doesn't support bulk upsert easily
     const updatePromises = body.cards.map(async (card) => {
       // Remove timestamp fields if they exist
-      const { created_at, updated_at, ...cardWithoutTimestamps } = card as any
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { created_at, updated_at, ...cardWithoutTimestamps } = card
       
-      const { data, error } = await supabase
+              const { data, error } = await supabase
         .from('cards')
         .update({
           title: cardWithoutTimestamps.title,
@@ -120,10 +129,10 @@ export async function PUT(request: NextRequest) {
           type: cardWithoutTimestamps.type,
           image_urls: cardWithoutTimestamps.image_urls,
           selected_image_url: cardWithoutTimestamps.selected_image_url,
-          position_x: Math.round(cardWithoutTimestamps.position_x),
-          position_y: Math.round(cardWithoutTimestamps.position_y),
-          width: Math.round(cardWithoutTimestamps.width),
-          height: Math.round(cardWithoutTimestamps.height),
+          position_x: Math.round(cardWithoutTimestamps.position_x || 0),
+          position_y: Math.round(cardWithoutTimestamps.position_y || 0),
+          width: Math.round(cardWithoutTimestamps.width || 400),
+          height: Math.round(cardWithoutTimestamps.height || 220),
           order_index: cardWithoutTimestamps.order_index,
           updated_at: new Date().toISOString(),
         })

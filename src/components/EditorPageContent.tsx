@@ -9,10 +9,16 @@ import { useCanvasStore } from '@/store/canvas'
 import type { CustomCardNodeData } from '@/types'
 
 // Action types for undo/redo system
+type ActionData =
+  | { type: 'DELETE'; data: { node: Node<CustomCardNodeData>; connectedEdges: Edge[] } }
+  | { type: 'EDIT'; data: CustomCardNodeData }
+  | { type: 'MOVE'; data: { position: { x: number; y: number } } }
+  | { type: 'ADD'; data?: never }
+
 interface Action {
   type: 'ADD' | 'DELETE' | 'EDIT' | 'MOVE'
   nodeId: string
-  data?: any
+  data?: ActionData['data']
   timestamp: number
 }
 
@@ -69,7 +75,7 @@ export default function EditorPageContent() {
     switch (actionToUndo.type) {
       case 'DELETE':
         // Restore deleted node
-        if (actionToUndo.data) {
+        if (actionToUndo.data && 'node' in actionToUndo.data) {
           const { node, connectedEdges } = actionToUndo.data
 
           // Restore the node
@@ -122,16 +128,24 @@ export default function EditorPageContent() {
 
       case 'EDIT':
         // Restore previous data
-        if (actionToUndo.data) {
+        if (
+          actionToUndo.data &&
+          !('node' in actionToUndo.data) &&
+          !('position' in actionToUndo.data)
+        ) {
           setNodes(prev =>
-            prev.map(n => (n.id === actionToUndo.nodeId ? { ...n, data: actionToUndo.data } : n))
+            prev.map(n =>
+              n.id === actionToUndo.nodeId
+                ? { ...n, data: actionToUndo.data as CustomCardNodeData }
+                : n
+            )
           )
         }
         break
 
       case 'MOVE':
         // Restore previous position
-        if (actionToUndo.data) {
+        if (actionToUndo.data && 'position' in actionToUndo.data) {
           setNodes(prev =>
             prev.map(n =>
               n.id === actionToUndo.nodeId ? { ...n, position: actionToUndo.data.position } : n

@@ -62,7 +62,7 @@ export interface Version {
   version_number: number
   title: string
   description?: string
-  data: any // JSONB 타입
+  data: Record<string, unknown> // JSONB 타입
   created_at: string
 }
 

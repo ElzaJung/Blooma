@@ -261,27 +261,24 @@ export default function SetupForm({ id, onSubmit }: SetupFormProps) {
   const setStoryboard = useCanvasStore(s => s.setStoryboard)
   const setCards = useCanvasStore(s => s.setCards)
   const { userId, isLoaded } = useUserStore()
-  const [isAuthenticating, setIsAuthenticating] = useState(false)
 
   // Debug function to check authentication status
   const debugAuthStatus = async () => {
     try {
       // Check Supabase session
-      const {
-        data: { session },
-        error,
-      } = await supabase.auth.getSession()
+      await supabase.auth.getSession()
 
       // Check browser cookies
       if (typeof window !== 'undefined') {
-        const cookies = document.cookie.split(';').map(c => c.trim())
-        const supabaseCookies = cookies.filter(c => c.startsWith('sb-'))
+        document.cookie
+          .split(';')
+          .map(c => c.trim())
+          .filter(c => c.startsWith('sb-'))
       }
 
       // Test API endpoint
       try {
-        const response = await fetch('/api/cards?debug=auth')
-        const debugData = await response.json()
+        await fetch('/api/cards?debug=auth')
       } catch (apiError) {
         console.error('API debug failed:', apiError)
       }
@@ -470,7 +467,7 @@ export default function SetupForm({ id, onSubmit }: SetupFormProps) {
         throw new Error('Failed to update project')
       }
 
-      const result = await response.json()
+      await response.json()
 
       return id
     } else {
@@ -567,60 +564,6 @@ export default function SetupForm({ id, onSubmit }: SetupFormProps) {
       console.error('No userId found or user not fully loaded - user not authenticated')
       alert('Please log in to continue')
       return
-    }
-
-    // Ensure user is fully authenticated before proceeding
-    const ensureAuthenticated = async (retryCount = 0): Promise<any> => {
-      if (!userId || !isLoaded) {
-        throw new Error('User not authenticated')
-      }
-
-      setIsAuthenticating(true)
-      try {
-        // Double-check with Supabase directly
-        const {
-          data: { session },
-          error,
-        } = await supabase.auth.getSession()
-        if (error || !session?.user) {
-          console.error('Session validation failed:', error)
-
-          // If this is a retry and we still have userId, try to refresh the session
-          if (retryCount < 2 && userId) {
-            const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession()
-            if (refreshError || !refreshData.session) {
-              throw new Error('Session refresh failed')
-            }
-            // Retry with refreshed session
-            return ensureAuthenticated(retryCount + 1)
-          }
-
-          throw new Error('Session validation failed')
-        }
-
-        if (session.user.id !== userId) {
-          console.error('User ID mismatch between store and session')
-          throw new Error('User ID mismatch')
-        }
-
-        return session.user
-      } catch (error) {
-        // If this is a retry and we still have userId, try to refresh the session
-        if (retryCount < 2 && userId) {
-          try {
-            const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession()
-            if (!refreshError && refreshData.session) {
-              // Retry with refreshed session
-              return ensureAuthenticated(retryCount + 1)
-            }
-          } catch (refreshError) {
-            console.error('Session refresh failed:', refreshError)
-          }
-        }
-        throw error
-      } finally {
-        setIsAuthenticating(false)
-      }
     }
 
     try {
@@ -1089,7 +1032,7 @@ export default function SetupForm({ id, onSubmit }: SetupFormProps) {
                 <Button
                   type="submit"
                   variant="reverse"
-                  disabled={isGeneratingImages || isSubmitting || isAuthenticating}
+                  disabled={isGeneratingImages || isSubmitting}
                   className="min-w-[180px]"
                 >
                   {isGeneratingImages ? (

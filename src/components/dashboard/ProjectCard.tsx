@@ -11,7 +11,7 @@ interface ProjectCardProps {
   project: Project
   viewMode: 'grid' | 'list'
   onDelete: (projectId: string) => void
-  onUpdate: (projectId: string, projectData: any) => Promise<void>
+  onUpdate: (projectId: string, projectData: Partial<Project>) => Promise<void>
   reverse?: boolean
   isDeleting?: boolean
 }

@@ -168,10 +168,10 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
       
       // Get the original cards from the database to detect deletions
       const originalCardsResponse = await fetch(`/api/cards?storyboard_id=${storyboardId}`)
-      let originalCards: any[] = []
+      let originalCards: { id: string }[] = []
       if (originalCardsResponse.ok) {
         const result = await originalCardsResponse.json()
-        originalCards = result.data || []
+        originalCards = (result.data || []) as { id: string }[]
       }
       
       // Find deleted cards (cards that exist in database but not in current cards)
